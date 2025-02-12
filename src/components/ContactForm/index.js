@@ -1,63 +1,104 @@
+import { React, useState } from "react";
 import PropTypes from "prop-types";
+
+import { ButtonContainer, Form } from "./styles";
+
+import isEmailValid from "../../utils/isEmailValid";
+import FormatPhone from "../../utils/formatPhone";
+import useErrors from "../../hooks/useErrors";
+
 import Button from "../Button";
 import FormGroup from "../FormGroup";
 import Input from "../Input";
 import Select from "../Select";
-import { ButtonContainer, Form } from "./styles";
-import { useRef, useState } from "react";
 
 export default function ContactForm({ buttonLabel }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [telefone, setTelefone] = useState("");
+    const [phone, setPhone] = useState("");
+    const [category, setCategory] = useState("");
 
-    const emailInput = useRef(null)
-    //const emailInput = document.getElementById('input-email')
-    //emailInput.value
-function handleClick(){
-    alert("Formulário submetido com sucesso!");
-}
+    const { setError, removeError, getErrorMensageByFieldName, errors } = useErrors();
+
+    const isFormValid = (name && errors.length === 0);
+
+    function hadleNameChange(event) {
+        setName(event.target.value);
+
+        if (!event.target.value) {
+            setError({ field: "name", message: "O campo nome é obrigatório" });
+        } else {
+            removeError("name");
+        }
+    }
+
+    function hadleEmailChange(event) {
+        setEmail(event.target.value);
+
+        if (event.target.value && !isEmailValid(event.target.value)) {
+            setError({ field: "email", message: "E-mail inválido" });
+        } else {
+            removeError("email");
+        }
+    }
+
+    function handlePhoneChange(event){
+        setPhone(FormatPhone(event.target.value));
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+       console.log({
+           name,
+           email,
+           phone: phone.replace(/\D/g,''),
+           category,
+       });
+    }
     return (
-        <Form>
-            <button type="button" onClick={handleClick}>
-                logar
-            </button>
-            <FormGroup>
+        <Form onSubmit={handleSubmit} noValidate>
+            <FormGroup error={getErrorMensageByFieldName("name")}>
                 <Input
+                    error={getErrorMensageByFieldName("name")}
+                    placeholder="Nome *"
                     value={name}
-                    placeholder="Nome"
-                    onChange={(event) => setName(event.target.value)}
+                    onChange={hadleNameChange}
                 />
             </FormGroup>
 
-            <FormGroup /** error="O formato do e-mail é invalido."*/ >
+            <FormGroup
+                error={getErrorMensageByFieldName("email")}
+            >
                 <Input
-                defaultValue="dsm@gmail.com"
+                    type="email"
+                    error={getErrorMensageByFieldName("email")}
                     placeholder="E-mail"
-                    ref={emailInput}
-                    /**error */
+                    value={email}
+                    onChange={hadleEmailChange}
                 />
             </FormGroup>
 
             <FormGroup>
                 <Input
-                type="number"
-                    placeholder="Telefone"
-                    value={telefone}
-                    onChange={(event) => setTelefone(event.target.value)}
+                    placeholder="phone"
+                    value={phone}
+                    onChange={handlePhoneChange}
                 />
             </FormGroup>
 
             <FormGroup>
-                <Select>
-                    <option value="inst">Instagram</option>
-                    <option value="inst">Instagram1</option>
-                    <option value="inst">Instagram2</option>
+                <Select
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                >
+                    <option value="">Categoria</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Discordy">Discordy</option>
                 </Select>
             </FormGroup>
 
             <ButtonContainer>
-                <Button type="subimit">{buttonLabel}</Button>
+                <Button type="subimit" disabled={!isFormValid}>{buttonLabel}</Button>
             </ButtonContainer>
         </Form>
     );

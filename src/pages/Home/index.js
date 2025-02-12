@@ -1,5 +1,6 @@
-import Loader from "../../components/Loader";
-import Modal from "../../components/Modal";
+import React from "react";
+//import Loader from "../../components/Loader";
+//import Modal from "../../components/Modal";
 import {
     Container,
     InputSearchContainer,
@@ -86,3 +87,12 @@ export default function Home() {
         </Container>
     );
 }
+
+fetch ('http://localhost:3000')
+.then(response => {
+    console.log('response', response)
+
+})
+.catch((error)=> {
+    console.error('error', error)
+})
