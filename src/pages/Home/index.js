@@ -1,45 +1,113 @@
-import React from "react";
-//import Loader from "../../components/Loader";
+import React, { useEffect, useMemo, useState } from "react";
+import { FaArrowUp, FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
+
+import Loader from "../../components/Loader";
 //import Modal from "../../components/Modal";
+import delay from "../../utils/delay";
 import {
     Container,
     InputSearchContainer,
     Header,
-    ListContainer,
+    ListHeader,
     Card,
 } from "../../pages/Home/styles";
-import { FaArrowUp, FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
 
 export default function Home() {
+    const [contacts, setContacts] = useState([]);
+    const [orderBy, setOrderBy] = useState("ASC");
+    const [searchTem, setSearchTem] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+
+    const filterContacts = useMemo(() => {
+        return contacts.filter((contact) =>
+            contact.name.toLowerCase().includes(searchTem.toLowerCase())
+        );
+    }, [contacts, searchTem]);
+
+
+    useEffect(() => {
+        async function LoadContacts() {
+            try {
+                setIsLoading(true);
+
+                const response = await fetch(
+                    `http://localhost:3001/contacts?orderBy=${orderBy}`
+                );
+                await delay(500);
+                const json = await response.json();
+                setContacts(json);
+                setIsLoading(false);
+            } catch (error) {
+                console.log("error", error);
+            }finally{
+                setIsLoading(false);
+
+            }
+        }
+        LoadContacts();
+    }, [orderBy]);
+
+    function handleToggleOrderBy() {
+        setOrderBy((prevState) => (prevState === "asc" ? "desc" : "asc"));
+    }
+
+    function handleChangeSearchTem(event) {
+        setSearchTem(event.target.value);
+    }
+
     return (
         <Container>
-            {/*<Modal danger/>
-            <Loader />*/}
+            <Loader isLoading={isLoading} />
             <InputSearchContainer>
-                <input type="text" placeholder="Pesquisar contato..." />
+                <input
+                    value={searchTem}
+                    type="text"
+                    placeholder="Pesquisar contato..."
+                    onChange={handleChangeSearchTem}
+                />
             </InputSearchContainer>
             <Header>
-                <strong>3 Contatos</strong>
+                <strong>
+                    {filterContacts.length}
+                    {filterContacts.length === 1
+                        ? " contato"
+                        : " contatos"}{" "}
+                </strong>
                 <a href="/new">Novo contato</a>
             </Header>
-            <ListContainer>
-                <header>
-                    <button type="button">
+            {filterContacts.length > 0 && (
+                <ListHeader orderBy={orderBy}>
+                    <button type="button" onClick={handleToggleOrderBy}>
                         <span>Nome</span>
-                        <FaArrowUp color="#5061fc" />
+                        <FaArrowUp
+                            color="#5061fc"
+                            style={{
+                                transform:
+                                    orderBy === "asc"
+                                        ? "rotate(180deg)"
+                                        : "rotate(0deg)",
+                                transition: "transform 0.3s ease-in",
+                                // Adicionando animação suave
+                            }}
+                        />
                     </button>
-                </header>
-                <Card>
+                </ListHeader>
+            )}
+
+            {filterContacts.map((contact) => (
+                <Card key={contact.id}>
                     <div className="info">
                         <div className="contact-name">
-                            <strong>Daniela Melo</strong>
-                            <small>Instagram</small>
+                            <strong>{contact.name}</strong>
+                            {contact.category_name && (
+                                <small>{contact.category_name}</small>
+                            )}
                         </div>
-                        <span>danielasmelo182@gmail.com</span>
-                        <span>(61) 9 9999-9999</span>
+                        <span>{contact.email}</span>
+                        <span>{contact.phone}</span>
                     </div>
                     <div className="actions">
-                        <a href="/edit/2">
+                        <a href={`/edit/${contact.id}`}>
                             <FaRegEdit color="#5061fc" />
                         </a>
                         <button type="button">
@@ -47,52 +115,7 @@ export default function Home() {
                         </button>
                     </div>
                 </Card>
-                <Card>
-                    <div className="info">
-                        <div className="contact-name">
-                            <strong>Daniela Melo</strong>
-                            <small>Instagram</small>
-                        </div>
-                        <span>danielasmelo182@gmail.com</span>
-                        <span>(61) 9 9999-9999</span>
-                    </div>
-                    <div className="actions">
-                        <a href="/edit/2">
-                            <FaRegEdit color="#5061fc" />
-                        </a>
-                        <button type="button">
-                            <FaRegTrashAlt color="#f00" />
-                        </button>
-                    </div>
-                </Card>
-                <Card>
-                    <div className="info">
-                        <div className="contact-name">
-                            <strong>Daniela Melo</strong>
-                            <small>Instagram</small>
-                        </div>
-                        <span>danielasmelo182@gmail.com</span>
-                        <span>(61) 9 9999-9999</span>
-                    </div>
-                    <div className="actions">
-                        <a href="/edit/2">
-                            <FaRegEdit color="#5061fc" />
-                        </a>
-                        <button type="button">
-                            <FaRegTrashAlt color="#f00" />
-                        </button>
-                    </div>
-                </Card>
-            </ListContainer>
+            ))}
         </Container>
     );
 }
-
-fetch ('http://localhost:3000')
-.then(response => {
-    console.log('response', response)
-
-})
-.catch((error)=> {
-    console.error('error', error)
-})

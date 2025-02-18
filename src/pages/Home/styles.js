@@ -5,22 +5,22 @@ export const Container = styled.div`
     position: relative;
 `;
 export const InputSearchContainer = styled.div`
-width: 100%;
-
-input{
     width: 100%;
-    height: 50px;
-    background: #fff;
-    border: none;
-    border-radius: 25px;
-    box-shadow: 8px 4px 18px rgba(0, 0, 0.04);
-    outline: 0;
-    padding: 0 16px;
 
-    &::placeholder{
-        color: #BCBCBC;
+    input {
+        width: 100%;
+        height: 50px;
+        background: #fff;
+        border: none;
+        border-radius: 25px;
+        box-shadow: 8px 4px 18px rgba(0, 0, 0.04);
+        outline: 0;
+        padding: 0 16px;
+
+        &::placeholder {
+            color: #bcbcbc;
+        }
     }
-}
 `;
 export const Header = styled.header`
     display: flex;
@@ -48,36 +48,34 @@ export const Header = styled.header`
         }
     }
 `;
-export const ListContainer = styled.div`
+export const ListHeader = styled.header`
     margin-top: 24px;
 
-    header {
-        margin-bottom: 8px;
-        button {
-            background: transparent;
-            border: none;
-            display: flex;
-            align-items: center;
-        }
+    button {
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+    }
 
-        span {
-            margin-right: 8px;
-            font-weight: bold;
-            color: ${({ theme }) => theme.colors.primary.main};
-        }
+    span {
+        margin-right: 8px;
+        font-weight: bold;
+        color: ${({ theme }) => theme.colors.primary.main};
     }
 `;
 
 export const Card = styled.div`
     background: #fff;
     box-shadow: 8px 4px 10px rgba(0, 0, 0.04);
+    margin-top: 5px;
     padding: 16px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    & + &{
+    & + & {
         margin-top: 16px;
     }
 
@@ -101,16 +99,15 @@ export const Card = styled.div`
             font-size: 14px;
             color: ${({ theme }) => theme.colors.gray.claro};
         }
-
     }
-    .actions{
-            display: flex;
-            align-items: center;
+    .actions {
+        display: flex;
+        align-items: center;
 
-            button{
-                background: transparent;
-                border: none;
-                margin-left: 8px;
-            }
+        button {
+            background: transparent;
+            border: none;
+            margin-left: 8px;
         }
+    }
 `;
