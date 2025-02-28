@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
     margin-top: 32px;
     position: relative;
+    margin-bottom: 32px;
 `;
 export const InputSearchContainer = styled.div`
     width: 100%;
@@ -25,8 +26,10 @@ export const InputSearchContainer = styled.div`
 export const Header = styled.header`
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: ${({ justifyContent }) => justifyContent};
     margin-top: 32px;
+    border-bottom: 2px solid ${({ theme }) => theme.colors.gray.cinza};
+    padding-bottom: 16px;
 
     strong {
         color: ${({ theme }) => theme.colors.gray.escuro};
@@ -109,5 +112,52 @@ export const Card = styled.div`
             border: none;
             margin-left: 8px;
         }
+    }
+`;
+
+export const ErrorContainer = styled.div`
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+
+    .details {
+        margin-left: 24px;
+    }
+
+    strong {
+        font-size: 22px;
+        color: ${({ theme }) => theme.colors.danger.main};
+        display: block;
+        margin-bottom: 8px;
+    }
+`;
+
+export const EmptyListContainer = styled.div`
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    p {
+        color: ${({ theme }) => theme.colors.gray.claro};
+        text-align: center;
+        margin-top: 8px;
+    }
+
+    strong {
+        color: ${({ theme }) => theme.colors.primary.main};
+    }
+`;
+
+export const SearchNotFoundContainer = styled.div`
+    margin-top: 16px;
+    display: flex;
+    align-items: flex-start;
+
+    span {
+        color: ${({ theme }) => theme.colors.gray.claro};
+        margin-left: 24px;
+        word-break: break-word;
+        flex: 1
     }
 `;

@@ -1,4 +1,4 @@
-export default{
+export default {
     colors: {
         background: `#f6f5fc`,
         primary:{
@@ -9,12 +9,16 @@ export default{
         },
         gray:{
             escuro: '#222222',
-            claro: '#bcbcbc'
+            claro: '#bcbcbc',
+            cinza: '#e5e5e5'
         },
         danger:{
             light: '#f97171',
             main: '#fc5050',
             dark: '#f63131',
+        },
+        success:{
+            main: '#51ca73',
         }
     }
 }
