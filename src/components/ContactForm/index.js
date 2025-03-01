@@ -1,152 +1,172 @@
-import { React, useEffect, useState } from "react";
-import PropTypes from "prop-types";
+/* eslint-disable react/react-in-jsx-scope */
+import {
+    useEffect,
+    useState,
+    forwardRef,
+    useImperativeHandle,
+  } from 'react';
+  import PropTypes from 'prop-types';
+  import useErrors from '../../hooks/useErrors';
+  import isEmailValid from '../../utils/isEmailValid';
+  import formatPhone from '../../utils/formatPhone';
+  import FormGroup from '../FormGroup';
+  import Input from '../Input';
+  import Select from '../Select';
+  import Button from '../Button';
 
-import { ButtonContainer, Form } from "./styles";
+  import CategoriesService from '../../services/CategoriesService';
 
-import isEmailValid from "../../utils/isEmailValid";
-import FormatPhone from "../../utils/formatPhone";
-import useErrors from "../../hooks/useErrors";
-import CategoriesService from "../../services/CategoriesService";
+  import { Form, ButtonContainer } from './styles';
 
-import Button from "../Button";
-import FormGroup from "../FormGroup";
-import Input from "../Input";
-import Select from "../Select";
-import propTypes from "prop-types";
-
-export default function ContactForm({ buttonLabel, onSubmit }) {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
-    const [categoryId, setCategoryId] = useState("");
+  const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, ref) {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [categoryId, setCategoryId] = useState('');
     const [categories, setCategories] = useState([]);
+
     const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSumitting] = useState(false);
 
-    const { setError, removeError, getErrorMensageByFieldName, errors } =
-        useErrors();
-
-    const isFormValid = name && errors.length === 0;
+    const {
+      setError,
+      removeError,
+      //getErrorMessageByFieldName,
+      errors,
+    } = useErrors();
 
     useEffect(() => {
-        async function loadCategories() {
-            try {
-                const categoriesList = await CategoriesService.listCategories();
-                setCategories(categoriesList);
-            } catch {
-                //
-            } finally {
-                setIsLoadingCategories(false);
-            }
+      async function loadCategories() {
+        setIsLoadingCategories(true);
+        try {
+          const categoriesList = await CategoriesService.listCategories();
+
+          setCategories(categoriesList);
+        } catch {
+            //
+        } finally {
+          setIsLoadingCategories(false);
         }
-        loadCategories();
+      }
+
+      loadCategories();
     }, []);
 
-    function hadleNameChange(event) {
-        setName(event.target.value);
+    const isFormValid = (name && errors.length === 0);
 
-        if (!event.target.value) {
-            setError({ field: "name", message: "O campo nome é obrigatório" });
-        } else {
-            removeError("name");
-        }
-    }
-
-    function hadleEmailChange(event) {
-        setEmail(event.target.value);
-
-        if (event.target.value && !isEmailValid(event.target.value)) {
-            setError({ field: "email", message: "E-mail inválido" });
-        } else {
-            removeError("email");
-        }
-    }
-
-    function handlePhoneChange(event) {
-        setPhone(FormatPhone(event.target.value));
-    }
-
-    async function handleSubmit(event) {
-        event.preventDefault();
-
-        setIsSubmitting(true);
-
-        await onSubmit({
-            name,
-            email,
-            phone,
-            categoryId,
-        });
-
-        setIsSubmitting(false);
+    useImperativeHandle(ref, () => ({
+      setFieldsValues: (contact) => {
+        setName(contact.name ?? '');
+        setEmail(contact.email ?? '');
+        setPhone(formatPhone(contact.phone) ?? '');
+        setCategoryId(contact.category_id ?? '');
+      },
+      resetFields: () => {
         setName('');
         setEmail('');
         setPhone('');
         setCategoryId('');
+      },
+    }), []);
+
+    function handleNameChange(event) {
+      setName(event.target.value);
+
+      if (!event.target.value) {
+        setError({ field: 'name', message: 'Nome é obrigatório' });
+      } else {
+        removeError('name');
+      }
+    }
+
+    function handleEmailChange(event) {
+      setEmail(event.target.value);
+
+      if (event.target.value && !isEmailValid(event.target.value)) {
+        setError({ field: 'email', message: 'E-mail inválido' });
+      } else {
+        removeError('email');
+      }
+    }
+
+    function handlePhoneChange(event) {
+      setPhone(formatPhone(event.target.value));
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+
+      setIsSumitting(true);
+
+      await onSubmit({
+        name, email, phone, categoryId,
+      });
+
+      setIsSumitting(false);
     }
 
     return (
-        <Form onSubmit={handleSubmit} noValidate>
-            <FormGroup error={getErrorMensageByFieldName("name")}>
-                <Input
-                    error={getErrorMensageByFieldName("name")}
-                    placeholder="Nome *"
-                    value={name}
-                    onChange={hadleNameChange}
-                    disabled={isSubmitting}
-                />
-            </FormGroup>
+      <Form onSubmit={handleSubmit} noValidate>
+        <FormGroup >
+          <Input
 
-            <FormGroup error={getErrorMensageByFieldName("email")}>
-                <Input
-                    type="email"
-                    error={getErrorMensageByFieldName("email")}
-                    placeholder="E-mail"
-                    value={email}
-                    onChange={hadleEmailChange}
-                    disabled={isSubmitting}
-                />
-            </FormGroup>
+            placeholder="Nome *"
+            value={name}
+            onChange={handleNameChange}
+            disabled={isSubmitting}
+          />
+        </FormGroup>
 
-            <FormGroup>
-                <Input
-                    placeholder="phone"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    disabled={isSubmitting}
-                />
-            </FormGroup>
+        <FormGroup >
+          <Input
+            type="email"
 
-            <FormGroup isLoading={isLoadingCategories || isSubmitting}>
-                <Select
-                    value={categoryId}
-                    onChange={(event) => setCategoryId(event.target.value)}
-                    disabled={isLoadingCategories}
-                >
-                    <option value="">Sem categoria</option>
+            placeholder="E-mail"
+            value={email}
+            onChange={handleEmailChange}
+            disabled={isSubmitting}
 
-                    {categories.map((categoryId) => (
-                        <option key={categoryId.id} value={categoryId.id}>
-                            {categoryId.name}
-                        </option>
-                    ))}
-                </Select>
-            </FormGroup>
+          />
+        </FormGroup>
 
-            <ButtonContainer>
-                <Button
-                    type="subimit"
-                    disabled={!isFormValid}
-                    isLoading={isSubmitting}
-                >
-                    {buttonLabel}
-                </Button>
-            </ButtonContainer>
-        </Form>
+        <FormGroup>
+          <Input
+            maxLength="15"
+            placeholder="Telefone"
+            value={phone}
+            onChange={handlePhoneChange}
+            disabled={isSubmitting}
+          />
+        </FormGroup>
+
+        <FormGroup isLoading={isLoadingCategories}>
+          <Select
+            value={categoryId}
+            onChange={(event) => setCategoryId(event.target.value)}
+            disabled={isLoadingCategories || isSubmitting}
+          >
+            <option value="">Sem categoria</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </Select>
+        </FormGroup>
+
+        <ButtonContainer>
+          <Button type="submit" disabled={!isFormValid} isLoading={isSubmitting}>
+            {buttonLabel}
+          </Button>
+        </ButtonContainer>
+      </Form>
     );
-}
+  });
 
-ContactForm.propTypes = {
+  ContactForm.propTypes = {
     buttonLabel: PropTypes.string.isRequired,
-    onSubmit: propTypes.func.isRequired,
-};
+    onSubmit: PropTypes.func.isRequired,
+  };
+
+  export default ContactForm
+ //ContactForm.displayName = 'ContactForm'
