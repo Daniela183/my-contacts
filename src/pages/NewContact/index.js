@@ -14,18 +14,19 @@ export default function NewContact() {
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
-                category_id: formData.category_id,
+                category_id: formData.categoryId,
             };
 
             await ContactsService.creatContact(contact);
 
-            contactFormRef.current.resetFields();
+            contactFormRef.current?.resetFields();
 
             toast({
                 type: 'success',
                 text: 'Contato cadastrado com sucesso!',
             });
-        } catch {
+        } catch (e) {
+            console.log(e);
             toast({
                 type: 'danger',
                 text: 'Ocorreu um erro ao cadastrar o contato!',
@@ -35,7 +36,7 @@ export default function NewContact() {
     return (
         <>
             <PageHeader title="Novo contato" />
-            <ContactForm buttonLabel="Cadastrar" onSubmit={handleSubmit} />
+            <ContactForm buttonLabel="Cadastrar" ref={contactFormRef} onSubmit={handleSubmit} />
         </>
     );
 }

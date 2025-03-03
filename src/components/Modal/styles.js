@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Overlay = styled.div`
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     left: 0;
@@ -28,9 +28,9 @@ export const Container = styled.div`
             : theme.colors.gray.escuro)};
     }
 
-    p {
-        margin-top: 8px;
-    }
+    .modal-body {
+    margin-top: 32px;
+  }
 `;
 export const Footer = styled.footer`
     margin-top: 32px;
@@ -42,7 +42,12 @@ export const Footer = styled.footer`
         background: transparent;
         border: none;
         font-size: 16px;
-        margin-right: 8px;
+        margin-right: 24px;
         color: ${({ theme }) => theme.colors.gray.claro};
+
+        &[disabled] {
+        cursor: not-allowed;
+      }
     }
+
 `;
